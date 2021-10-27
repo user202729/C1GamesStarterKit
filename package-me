@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 rm -f /tmp/zipped.zip
 zip -r /tmp/zipped.zip python-algo-me --exclude '*/__pycache__/*'  --exclude '*/.git/*'
 rm -rf /tmp/packaged-folder
