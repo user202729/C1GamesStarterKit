@@ -1,0 +1,4 @@
+#!/bin/bash
+hard_clear
+cd "$(dirname "$0")"
+./scripts/run_match.sh python-algo-me python-clone | grep  --color=always 'Winner\|^'
