@@ -1,8 +1,14 @@
 #!/bin/bash
+
+if [[ $# != 1 ]]; then
+	echo "Usage: $0 <package-name>" >&2
+	exit 1
+fi
+
 cd "$(dirname "$0")"
 rm -f /tmp/zipped.zip
 zip -r /tmp/zipped.zip python-algo-me --exclude '*/__pycache__/*'  --exclude '*/.git/*'
 rm -rf /tmp/packaged-folder
 mkdir /tmp/packaged-folder
 unzip /tmp/zipped.zip -d /tmp/packaged-folder
-
+mv /tmp/packaged-folder/python-algo-me/ /tmp/packaged-folder/"$1"
