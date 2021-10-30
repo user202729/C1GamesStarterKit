@@ -23,13 +23,14 @@ import pickle
 
 
 profileStoragePath = Path(sys.argv[0]).parent / "terminal-profile"
+profileBackupPath = Path(sys.argv[0]).parent / "terminal-profile-backup"
 #cookiesFilename = Path(sys.argv[0]).parent / "terminal-cookies.pkl"
 cookiesFilename: Any = None
 
 try:
 	driver  # type: ignore
 except NameError:
-	#driver=webdriver.Firefox(executable_path="geckodriver-v0.28.0-linux64")
+	driver=webdriver.Firefox(executable_path="geckodriver-v0.28.0-linux64")
 	driver = webdriver.Firefox(executable_path="geckodriver-v0.28.0-linux64",
 					 firefox_profile=webdriver.FirefoxProfile(profileStoragePath)
 					)
@@ -50,13 +51,29 @@ def loadCookies___()->None:
     except FileNotFoundError:
         print("Cookie not found")
     
-def dumpProfile()->None:
-	driver.execute_script("window.close()")
+def closeAndDumpProfile()->None:
+	print("======== start dump")
+	try:
+		driver.execute_script("window.close()")
+	except:  # might be already closed or something
+		import traceback
+		print("======== while closing window :")
+		traceback.print_exc()
+		print("======== (end)")
+
 	time.sleep(0.5)
 	currentProfilePath = driver.capabilities["moz:profile"]
+
+	try: shutil.rmtree(profileBackupPath)
+	except FileNotFoundError: pass
+
+	try: profileStoragePath.rename(profileBackupPath)
+	except FileNotFoundError: pass
+
 	shutil.copytree(currentProfilePath, profileStoragePath,
 					ignore_dangling_symlinks=True
 					)
+	print("Dump successful")
 
 
 
@@ -97,7 +114,7 @@ try:
 				print("Waiting for login...")
 				time.sleep(1)
 			print("Okay, logged in")
-			dumpProfile()
+			#closeAndDumpProfile()
 
 			driver.get("https://terminal.c1games.com/playground")
 
@@ -105,7 +122,7 @@ try:
 			# okay already logged in
 			pass
 
-		#dumpProfile()
+		#closeAndDumpProfile()
 		#print("**TEMPORARY**")
 
 		#advanced option button
@@ -144,4 +161,8 @@ try:
 			raise
 
 finally:
-	driver.quit()
+	try:
+		print("======== dump profile")
+		closeAndDumpProfile()
+	finally:
+		driver.quit()

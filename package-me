@@ -7,7 +7,12 @@ fi
 
 cd "$(dirname "$0")"
 rm -f /tmp/zipped.zip
-zip -r /tmp/zipped.zip python-algo-me --exclude '*/__pycache__/*'  --exclude '*/.git/*'
+zip -r /tmp/zipped.zip python-algo-me \
+	--exclude '*/__pycache__/*'  \
+	--exclude '*/.git/*' \
+	--exclude '*/libpypy3-c.so' \
+	--exclude '*/pypy3.6-7.2.0-linux_x86_64-portable/*'
+
 rm -rf /tmp/packaged-folder
 mkdir /tmp/packaged-folder
 unzip /tmp/zipped.zip -d /tmp/packaged-folder
